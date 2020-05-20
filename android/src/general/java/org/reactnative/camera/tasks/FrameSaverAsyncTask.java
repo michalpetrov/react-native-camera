@@ -40,47 +40,22 @@ public class FrameSaverAsyncTask extends android.os.AsyncTask<Void, Void, String
         if (isCancelled() || mDelegate == null) {
             return null;
         }
-        File imageFile;
         try {
-            Frame.Builder builder = new Frame.Builder();
-            ByteBuffer byteBuffer = ByteBuffer.wrap(mImageData);
-            builder.setImageData(byteBuffer, mWidth, mHeight, ImageFormat.NV21);
-            switch (mRotation) {
-                case 90:
-                    builder.setRotation(Frame.ROTATION_90);
-                    break;
-                case 180:
-                    builder.setRotation(Frame.ROTATION_180);
-                    break;
-                case 270:
-                    builder.setRotation(Frame.ROTATION_270);
-                    break;
-                default:
-                    builder.setRotation(Frame.ROTATION_0);
-            }
-
-
-//            BitmapFactory.Options options = new BitmapFactory.Options();
-//            options.inJustDecodeBounds = true;
-//            BitmapFactory.decodeByteArray(mImageData, 0, mImageData.length, options);
-
-            imageFile = File.createTempFile(UUID.randomUUID().toString(), ".jpg", mCacheDir);
+            File imageFile = File.createTempFile(UUID.randomUUID().toString(), ".jpg", mCacheDir);
             imageFile.createNewFile();
 
-//            YuvImage image = new YuvImage(mImageData, ImageFormat.NV21, mWidth, mHeight, null);
-//            Rect rectangle = new Rect();
-//            rectangle.bottom = mHeight;
-//            rectangle.top = 0;
-//            rectangle.left = 0;
-//            rectangle.right = mWidth;
-//            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//            image.compressToJpeg(rectangle, 100, baos);
+            byte[] rotatedImageData = rotateNV21(mImageData, mWidth, mHeight, mRotation);
+            int rotatedImageWidth = mRotation == 90 || mRotation == 270 ? mHeight : mWidth;
+            int rotatedImageHeight = mRotation == 90 || mRotation == 270 ? mWidth : mHeight;
+            YuvImage image = new YuvImage(rotatedImageData, ImageFormat.NV21, rotatedImageWidth, rotatedImageHeight, null);
+            Rect rectangle = new Rect();
+            rectangle.bottom = rotatedImageHeight;
+            rectangle.top = 0;
+            rectangle.left = 0;
+            rectangle.right = rotatedImageWidth;
 
             FileOutputStream fOut = new FileOutputStream(imageFile);
-            Frame frame = builder.build();
-            Bitmap bitmap = frame.getBitmap();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fOut);
-//            fOut.write(baos.toByteArray());
+            image.compressToJpeg(rectangle, 90, fOut);
             fOut.flush();
             fOut.close();
             return Uri.fromFile(imageFile).toString();
@@ -95,11 +70,51 @@ public class FrameSaverAsyncTask extends android.os.AsyncTask<Void, Void, String
         super.onPostExecute(uri);
 
         if (uri == null) {
-//      mDelegate.onBarcodeDetectionError(mBarcodeDetector);
         } else {
             mDelegate.onFrameSaved(uri);
             mDelegate.onFrameSavingTaskCompleted();
         }
+    }
+
+    public static byte[] rotateNV21(final byte[] yuv,
+                                    final int width,
+                                    final int height,
+                                    final int rotation)
+    {
+        if (rotation == 0) return yuv;
+        if (rotation % 90 != 0 || rotation < 0 || rotation > 270) {
+            throw new IllegalArgumentException("0 <= rotation < 360, rotation % 90 == 0");
+        }
+
+        final byte[]  output    = new byte[yuv.length];
+        final int     frameSize = width * height;
+        final boolean swap      = rotation % 180 != 0;
+        final boolean xflip     = rotation % 270 != 0;
+        final boolean yflip     = rotation >= 180;
+
+        for (int j = 0; j < height; j++) {
+            for (int i = 0; i < width; i++) {
+                final int yIn = j * width + i;
+                final int uIn = frameSize + (j >> 1) * width + (i & ~1);
+                final int vIn = uIn       + 1;
+
+                final int wOut     = swap  ? height              : width;
+                final int hOut     = swap  ? width               : height;
+                final int iSwapped = swap  ? j                   : i;
+                final int jSwapped = swap  ? i                   : j;
+                final int iOut     = xflip ? wOut - iSwapped - 1 : iSwapped;
+                final int jOut     = yflip ? hOut - jSwapped - 1 : jSwapped;
+
+                final int yOut = jOut * wOut + iOut;
+                final int uOut = frameSize + (jOut >> 1) * wOut + (iOut & ~1);
+                final int vOut = uOut + 1;
+
+                output[yOut] = (byte)(0xff & yuv[yIn]);
+                output[uOut] = (byte)(0xff & yuv[uIn]);
+                output[vOut] = (byte)(0xff & yuv[vIn]);
+            }
+        }
+        return output;
     }
 
 }
