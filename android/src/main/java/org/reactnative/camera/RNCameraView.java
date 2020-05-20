@@ -360,7 +360,7 @@ public class RNCameraView extends CameraView implements LifecycleEventListener, 
       initBarcodeReader();
     }
     this.mShouldScanBarCodes = shouldScanBarCodes;
-    setScanning(mShouldDetectFaces || mShouldGoogleDetectBarcodes || mShouldScanBarCodes || mShouldRecognizeText);
+    setScanning(mShouldDetectFaces || mShouldGoogleDetectBarcodes || mShouldScanBarCodes || mShouldRecognizeText || mShouldSaveFrames);
   }
 
   public void onBarCodeRead(Result barCode, int width, int height) {
@@ -466,7 +466,7 @@ public class RNCameraView extends CameraView implements LifecycleEventListener, 
       setupFaceDetector();
     }
     this.mShouldDetectFaces = shouldDetectFaces;
-    setScanning(mShouldDetectFaces || mShouldGoogleDetectBarcodes || mShouldScanBarCodes || mShouldRecognizeText);
+    setScanning(mShouldDetectFaces || mShouldGoogleDetectBarcodes || mShouldScanBarCodes || mShouldRecognizeText || mShouldSaveFrames);
   }
 
   public void onFacesDetected(WritableArray data) {
@@ -503,7 +503,7 @@ public class RNCameraView extends CameraView implements LifecycleEventListener, 
       setupBarcodeDetector();
     }
     this.mShouldGoogleDetectBarcodes = shouldDetectBarcodes;
-    setScanning(mShouldDetectFaces || mShouldGoogleDetectBarcodes || mShouldScanBarCodes || mShouldRecognizeText);
+    setScanning(mShouldDetectFaces || mShouldGoogleDetectBarcodes || mShouldScanBarCodes || mShouldRecognizeText || mShouldSaveFrames);
   }
 
   public void setGoogleVisionBarcodeType(int barcodeType) {
@@ -563,7 +563,7 @@ public class RNCameraView extends CameraView implements LifecycleEventListener, 
 
   public void setShouldRecognizeText(boolean shouldRecognizeText) {
     this.mShouldRecognizeText = shouldRecognizeText;
-    setScanning(mShouldDetectFaces || mShouldGoogleDetectBarcodes || mShouldScanBarCodes || mShouldRecognizeText);
+    setScanning(mShouldDetectFaces || mShouldGoogleDetectBarcodes || mShouldScanBarCodes || mShouldRecognizeText || mShouldSaveFrames);
   }
 
   public void onTextRecognized(WritableArray serializedData) {

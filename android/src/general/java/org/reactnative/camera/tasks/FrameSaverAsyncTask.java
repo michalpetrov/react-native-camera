@@ -1,5 +1,7 @@
 package org.reactnative.camera.tasks;
 
+import android.util.Log;
+
 public class FrameSaverAsyncTask extends android.os.AsyncTask<Void, Void, String> {
   private byte[] mImageData;
   private FrameSaverAsyncTaskDelegate mDelegate;
@@ -11,6 +13,7 @@ public class FrameSaverAsyncTask extends android.os.AsyncTask<Void, Void, String
 
   @Override
   protected String doInBackground(Void... ignored) {
+    Log.i("RNC", "Saving frame");
     if (isCancelled() || mDelegate == null) {
       return null;
     }
