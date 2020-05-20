@@ -175,7 +175,7 @@ public class RNCameraView extends CameraView implements LifecycleEventListener, 
         if (willCallFrameTask) {
           frameSaverTaskLock = true;
           FrameSaverAsyncTaskDelegate delegate = (FrameSaverAsyncTaskDelegate) cameraView;
-          new FrameSaverAsyncTask(delegate, data).execute();
+          new FrameSaverAsyncTask(delegate, data, mThemedReactContext.getCacheDir()).execute();
         }
 
         if (willCallBarCodeTask) {
