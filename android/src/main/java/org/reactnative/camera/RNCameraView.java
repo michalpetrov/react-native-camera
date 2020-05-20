@@ -156,6 +156,8 @@ public class RNCameraView extends CameraView implements LifecycleEventListener, 
         }
       }
 
+
+
       @Override
       public void onFramePreview(CameraView cameraView, byte[] data, int width, int height, int rotation) {
         int correctRotation = RNCameraViewHelper.getCorrectCameraRotation(rotation, getFacing(), getCameraOrientation());
@@ -216,6 +218,10 @@ public class RNCameraView extends CameraView implements LifecycleEventListener, 
       }
     });
   }
+
+    public void resumeFrameSaving() {
+        frameSaverTaskLock = false;
+    }
 
   @Override
   protected void onLayout(boolean changed, int left, int top, int right, int bottom) {

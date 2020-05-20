@@ -451,6 +451,7 @@ export class RNCamera extends Component<RNCameraProps & ViewProperties> {
   stopRecording(): void;
   pausePreview(): void;
   resumePreview(): void;
+  resumeFrameSaving(): void;
   getAvailablePictureSizes(): Promise<string[]>;
 
   /** Android only */

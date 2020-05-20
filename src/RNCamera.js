@@ -636,6 +636,10 @@ export default class Camera extends React.Component<PropsType, StateType> {
     CameraManager.resumePreview(this._cameraHandle);
   }
 
+  resumeFrameSaving() {
+    CameraManager.resumeFrameSaving(this._cameraHandle);
+  }
+
   _onMountError = ({ nativeEvent }: EventCallbackArgumentsType) => {
     if (this.props.onMountError) {
       this.props.onMountError(nativeEvent);
