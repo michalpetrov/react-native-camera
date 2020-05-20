@@ -1,20 +1,13 @@
 package org.reactnative.camera.tasks;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
-import android.hardware.Camera;
 import android.net.Uri;
 import android.util.Log;
 
-import com.google.android.gms.vision.Frame;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.nio.ByteBuffer;
 import java.util.UUID;
 
 public class FrameSaverAsyncTask extends android.os.AsyncTask<Void, Void, String> {
@@ -29,7 +22,7 @@ public class FrameSaverAsyncTask extends android.os.AsyncTask<Void, Void, String
         mImageData = imageData;
         mWidth = width;
         mHeight = height;
-        mRotation = rotation;
+        mRotation = 270;
         mCacheDir = cacheDir;
         mDelegate = delegate;
     }

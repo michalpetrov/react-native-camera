@@ -553,7 +553,7 @@ public class RNCameraView extends CameraView implements LifecycleEventListener, 
 
   @Override
   public void onFrameSavingTaskCompleted() {
-    frameSaverTaskLock = false;
+//    frameSaverTaskLock = false;
   }
 
   /**
