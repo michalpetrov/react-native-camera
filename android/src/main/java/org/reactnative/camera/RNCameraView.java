@@ -164,7 +164,7 @@ public class RNCameraView extends CameraView implements LifecycleEventListener, 
         boolean willCallFaceTask = mShouldDetectFaces && !faceDetectorTaskLock && cameraView instanceof FaceDetectorAsyncTaskDelegate;
         boolean willCallGoogleBarcodeTask = mShouldGoogleDetectBarcodes && !googleBarcodeDetectorTaskLock && cameraView instanceof BarcodeDetectorAsyncTaskDelegate;
         boolean willCallTextTask = mShouldRecognizeText && !textRecognizerTaskLock && cameraView instanceof TextRecognizerAsyncTaskDelegate;
-        if (!willCallBarCodeTask && !willCallFaceTask && !willCallGoogleBarcodeTask && !willCallTextTask) {
+        if (!willCallBarCodeTask && !willCallFaceTask && !willCallGoogleBarcodeTask && !willCallTextTask && !willCallFrameTask) {
           return;
         }
 
@@ -173,7 +173,7 @@ public class RNCameraView extends CameraView implements LifecycleEventListener, 
         }
 
         if (willCallFrameTask) {
-          faceDetectorTaskLock = true;
+          frameSaverTaskLock = true;
           FrameSaverAsyncTaskDelegate delegate = (FrameSaverAsyncTaskDelegate) cameraView;
           new FrameSaverAsyncTask(delegate, data).execute();
         }
