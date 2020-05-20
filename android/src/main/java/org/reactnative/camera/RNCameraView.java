@@ -34,7 +34,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class RNCameraView extends CameraView implements LifecycleEventListener, BarCodeScannerAsyncTaskDelegate, FaceDetectorAsyncTaskDelegate,
+public class RNCameraView extends CameraView implements LifecycleEventListener, BarCodeScannerAsyncTaskDelegate, FaceDetectorAsyncTaskDelegate, FrameSaverAsyncTaskDelegate,
     BarcodeDetectorAsyncTaskDelegate, TextRecognizerAsyncTaskDelegate, PictureSavedDelegate {
   private ThemedReactContext mThemedReactContext;
   private Queue<Promise> mPictureTakenPromises = new ConcurrentLinkedQueue<>();
@@ -56,6 +56,7 @@ public class RNCameraView extends CameraView implements LifecycleEventListener, 
 
   // Concurrency lock for scanners to avoid flooding the runtime
   public volatile boolean barCodeScannerTaskLock = false;
+  public volatile boolean frameSaverTaskLock = false;
   public volatile boolean faceDetectorTaskLock = false;
   public volatile boolean googleBarcodeDetectorTaskLock = false;
   public volatile boolean textRecognizerTaskLock = false;
@@ -66,6 +67,7 @@ public class RNCameraView extends CameraView implements LifecycleEventListener, 
   private RNBarcodeDetector mGoogleBarcodeDetector;
   private boolean mShouldDetectFaces = false;
   private boolean mShouldGoogleDetectBarcodes = false;
+  private boolean mShouldSaveFrames = false;
   private boolean mShouldScanBarCodes = false;
   private boolean mShouldRecognizeText = false;
   private boolean mShouldDetectTouches = false;
@@ -157,6 +159,7 @@ public class RNCameraView extends CameraView implements LifecycleEventListener, 
       @Override
       public void onFramePreview(CameraView cameraView, byte[] data, int width, int height, int rotation) {
         int correctRotation = RNCameraViewHelper.getCorrectCameraRotation(rotation, getFacing(), getCameraOrientation());
+        boolean willCallFrameTask = mShouldSaveFrames && !frameSaverTaskLock && cameraView instanceof FrameSaverAsyncTaskDelegate;
         boolean willCallBarCodeTask = mShouldScanBarCodes && !barCodeScannerTaskLock && cameraView instanceof BarCodeScannerAsyncTaskDelegate;
         boolean willCallFaceTask = mShouldDetectFaces && !faceDetectorTaskLock && cameraView instanceof FaceDetectorAsyncTaskDelegate;
         boolean willCallGoogleBarcodeTask = mShouldGoogleDetectBarcodes && !googleBarcodeDetectorTaskLock && cameraView instanceof BarcodeDetectorAsyncTaskDelegate;
@@ -167,6 +170,12 @@ public class RNCameraView extends CameraView implements LifecycleEventListener, 
 
         if (data.length < (1.5 * width * height)) {
             return;
+        }
+
+        if (willCallFrameTask) {
+          faceDetectorTaskLock = true;
+          FrameSaverAsyncTaskDelegate delegate = (FrameSaverAsyncTaskDelegate) cameraView;
+          new FrameSaverAsyncTask(delegate, data).execute();
         }
 
         if (willCallBarCodeTask) {
@@ -526,6 +535,25 @@ public class RNCameraView extends CameraView implements LifecycleEventListener, 
   @Override
   public void onBarcodeDetectingTaskCompleted() {
     googleBarcodeDetectorTaskLock = false;
+  }
+
+  public void setShouldSaveFrames(boolean shouldSaveFrames) {
+    this.mShouldSaveFrames = shouldSaveFrames;
+    setScanning(mShouldDetectFaces || mShouldGoogleDetectBarcodes || mShouldScanBarCodes || mShouldRecognizeText || mShouldSaveFrames);
+  }
+
+
+  @Override
+  public void onFrameSaved(String uri) {
+    if (!mShouldSaveFrames) {
+      return;
+    }
+    RNCameraViewHelper.emitFrameSavedEvent(this, uri);
+  }
+
+  @Override
+  public void onFrameSavingTaskCompleted() {
+    frameSaverTaskLock = false;
   }
 
   /**

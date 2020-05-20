@@ -283,6 +283,17 @@ public class RNCameraViewHelper {
     });
   }
 
+  public static void emitFrameSavedEvent(final ViewGroup view, final String uri) {
+    final ReactContext reactContext = (ReactContext) view.getContext();
+    reactContext.runOnNativeModulesQueueThread(new Runnable() {
+      @Override
+      public void run() {
+        FrameSavedEvent event = FrameSavedEvent.obtain(view.getId(), uri);
+        reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher().dispatchEvent(event);
+      }
+    });
+  }
+
   // Barcode detection events
 
   public static void emitBarcodesDetectedEvent(final ViewGroup view, final WritableArray barcodes) {

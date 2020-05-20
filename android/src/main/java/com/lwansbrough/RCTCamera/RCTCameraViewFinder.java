@@ -50,6 +50,10 @@ class RCTCameraViewFinder extends TextureView implements TextureView.SurfaceText
     // concurrency lock for barcode scanner to avoid flooding the runtime
     public static volatile boolean barcodeScannerTaskLock = false;
 
+
+    // concurrency lock for frame to avoid flooding the runtime
+    public static volatile boolean frameTaskLock = false;
+
     // reader instance for the barcode scanner
     private final MultiFormatReader _multiFormatReader = new MultiFormatReader();
 
@@ -326,6 +330,39 @@ class RCTCameraViewFinder extends TextureView implements TextureView.SurfaceText
         if (RCTCamera.getInstance().isBarcodeScannerEnabled() && !RCTCameraViewFinder.barcodeScannerTaskLock) {
             RCTCameraViewFinder.barcodeScannerTaskLock = true;
             new ReaderAsyncTask(camera, data).execute();
+        }
+        if (RCTCamera.getInstance().isFrameEnabled() && !RCTCameraViewFinder.frameTaskLock) {
+            RCTCameraViewFinder.frameTaskLock = true;
+            new FrameAsyncTask(camera, data).execute();
+        }
+    }
+
+    private class FrameAsyncTask extends AsyncTask<Void, Void, Void> {
+        private byte[] imageData;
+        private final Camera camera;
+
+        FrameAsyncTask(Camera camera, byte[] imageData) {
+            this.camera = camera;
+            this.imageData = imageData;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            if (isCancelled()) {
+                return null;
+            }
+
+            try {
+                // todo save image
+                String uri = "tralala";
+                ReactContext reactContext = RCTCameraModule.getReactContextSingleton();
+                reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("CameraFrameSaveAndroid", uri);
+            } catch (Throwable t) {
+                // meh
+            } finally {
+                RCTCameraViewFinder.frameTaskLock = false;
+                return null;
+            }
         }
     }
 

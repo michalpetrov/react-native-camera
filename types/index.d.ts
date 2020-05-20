@@ -3,6 +3,8 @@
 //                 Trent Jones <https://github.com/FizzBuzz791>
 //                 Brent Kelly <https://github.com/mrbrentkelly>
 // If you modify this file, put your GitHub info here as well (for easy contacting purposes)
+import { Component, ReactNode } from 'react'
+import { findNodeHandle, NativeMethods, ViewProperties } from 'react-native'
 
 /*
  * Author notes:
@@ -11,9 +13,6 @@
  *
  * If you are seeing this from the future, please, send us your cutting-edge technology :) (if it exists)
  */
-import { Component, ReactNode } from 'react';
-import { NativeMethods, ViewProperties, findNodeHandle } from 'react-native';
-
 type Orientation = Readonly<{
   auto: any;
   landscapeLeft: any;
@@ -96,13 +95,11 @@ type RecordAudioPermissionStatus = Readonly<
     NOT_AUTHORIZED: 'NOT_AUTHORIZED';
   }>
 >;
-type FaCC = (
-  params: {
-    camera: RNCamera;
-    status: keyof CameraStatus;
-    recordAudioPermissionStatus: keyof RecordAudioPermissionStatus;
-  },
-) => JSX.Element;
+type FaCC = (params: {
+  camera: RNCamera;
+  status: keyof CameraStatus;
+  recordAudioPermissionStatus: keyof RecordAudioPermissionStatus;
+}) => JSX.Element;
 
 export interface Constants {
   CameraStatus: CameraStatus;
@@ -170,10 +167,10 @@ export interface RNCameraProps {
   /** iOS only */
   onAudioInterrupted?(): void;
   onAudioConnected?(): void;
-  onTap?(origin:Point):void;
-  onDoubleTap?(origin:Point):void;
+  onTap?(origin: Point): void;
+  onDoubleTap?(origin: Point): void;
   /** Use native pinch to zoom implementation*/
-  useNativeZoom?:boolean;
+  useNativeZoom?: boolean;
   /** Value: float from 0 to 1.0 */
   zoom?: number;
   /** iOS only. float from 0 to any. Locks the max zoom value to the provided value
@@ -200,6 +197,9 @@ export interface RNCameraProps {
       | { width: number; height: number; origin: Array<Point<string>> }
       | { origin: Point<string>; size: Size<string> };
   }): void;
+
+  // -- FRAME PROPS
+  onFrame?(event: { uri: string }): void;
 
   onGoogleVisionBarcodesDetected?(event: { barcodes: Barcode[] }): void;
 

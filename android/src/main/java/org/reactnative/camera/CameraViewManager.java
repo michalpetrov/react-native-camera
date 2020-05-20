@@ -19,6 +19,7 @@ public class CameraViewManager extends ViewGroupManager<RNCameraView> {
     EVENT_CAMERA_READY("onCameraReady"),
     EVENT_ON_MOUNT_ERROR("onMountError"),
     EVENT_ON_BAR_CODE_READ("onBarCodeRead"),
+    EVENT_ON_FRAME_SAVED("onFrameSaved"),
     EVENT_ON_FACES_DETECTED("onFacesDetected"),
     EVENT_ON_BARCODES_DETECTED("onGoogleVisionBarcodesDetected"),
     EVENT_ON_FACE_DETECTION_ERROR("onFaceDetectionError"),
@@ -155,6 +156,11 @@ public class CameraViewManager extends ViewGroupManager<RNCameraView> {
   @ReactProp(name = "barCodeScannerEnabled")
   public void setBarCodeScanning(RNCameraView view, boolean barCodeScannerEnabled) {
     view.setShouldScanBarCodes(barCodeScannerEnabled);
+  }
+
+  @ReactProp(name = "frameEnabled")
+  public void setFrameSaving(RNCameraView view, boolean frameEnabled) {
+    view.setShouldSaveFrames(frameEnabled);
   }
 
   @ReactProp(name = "useCamera2Api")
