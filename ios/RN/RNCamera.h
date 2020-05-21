@@ -42,9 +42,11 @@
 @property(nonatomic, assign) BOOL isReadingBarCodes;
 @property(nonatomic, assign) BOOL isRecordingInterrupted;
 @property(nonatomic, assign) BOOL isDetectingFaces;
+@property(nonatomic, assign) BOOL isSavingFrames;
 @property(nonatomic, assign) BOOL canReadText;
 @property(nonatomic, assign) BOOL canDetectFaces;
 @property(nonatomic, assign) BOOL canDetectBarcodes;
+@property(nonatomic, assign) BOOL canSaveFrames;
 @property(nonatomic, assign) BOOL captureAudio;
 @property(nonatomic, assign) BOOL keepAudioSession;
 @property(nonatomic, assign) BOOL useNativeZoom;
@@ -91,12 +93,14 @@
                        reject:(RCTPromiseRejectBlock)reject;
 - (void)stopRecording;
 - (void)resumePreview;
+- (void)resumeFrameSaving;
 - (void)pausePreview;
 - (void)setupOrDisablePinchZoom;
 - (void)setupOrDisableBarcodeScanner;
 - (void)setupOrDisableTextDetector;
 - (void)setupOrDisableFaceDetector;
 - (void)setupOrDisableBarcodeDetector;
+- (void)setupOrDisableFrameSaver;
 - (void)onReady:(NSDictionary *)event;
 - (void)onMountingError:(NSDictionary *)event;
 - (void)onCodeRead:(NSDictionary *)event;
@@ -108,6 +112,7 @@
 - (void)onText:(NSDictionary *)event;
 - (void)onTouch:(NSDictionary *)event;
 - (void)onBarcodesDetected:(NSDictionary *)event;
+- (void)onFrame:(NSDictionary *)event;
 - (bool)isRecording;
 - (void)onSubjectAreaChanged:(NSDictionary *)event;
 

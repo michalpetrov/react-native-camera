@@ -24,6 +24,7 @@ RCT_EXPORT_VIEW_PROPERTY(onPictureSaved, RCTDirectEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onRecordingStart, RCTDirectEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onRecordingEnd, RCTDirectEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onTextRecognized, RCTDirectEventBlock);
+RCT_EXPORT_VIEW_PROPERTY(onFrame, RCTDirectEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(onSubjectAreaChanged, RCTDirectEventBlock);
 RCT_EXPORT_VIEW_PROPERTY(videoStabilizationMode, NSInteger);
 RCT_EXPORT_VIEW_PROPERTY(onTouch, RCTDirectEventBlock);
@@ -87,7 +88,7 @@ RCT_EXPORT_VIEW_PROPERTY(onTouch, RCTDirectEventBlock);
 
 - (NSArray<NSString *> *)supportedEvents
 {
-    return @[@"onCameraReady", @"onAudioInterrupted", @"onAudioConnected", @"onMountError", @"onBarCodeRead", @"onFacesDetected", @"onPictureTaken", @"onPictureSaved", @"onRecordingStart", @"onRecordingEnd", @"onTextRecognized", @"onGoogleVisionBarcodesDetected", @"onSubjectAreaChanged",@"onTouch"];
+    return @[@"onCameraReady", @"onAudioInterrupted", @"onAudioConnected", @"onMountError", @"onBarCodeRead", @"onFacesDetected", @"onPictureTaken", @"onPictureSaved", @"onRecordingStart", @"onRecordingEnd", @"onTextRecognized", @"onFrame", @"onGoogleVisionBarcodesDetected", @"onSubjectAreaChanged",@"onTouch"];
 }
 
 + (NSDictionary *)validCodecTypes
@@ -310,6 +311,13 @@ RCT_CUSTOM_VIEW_PROPERTY(textRecognizerEnabled, BOOL, RNCamera)
     [view setupOrDisableTextDetector];
 }
 
+RCT_CUSTOM_VIEW_PROPERTY(frameEnabled, BOOL, RNCamera)
+{
+
+    view.canSaveFrames = [RCTConvert BOOL:json];
+    [view setupOrDisableFrameSaver];
+}
+
 RCT_CUSTOM_VIEW_PROPERTY(captureAudio, BOOL, RNCamera)
 {
     [view setCaptureAudio:[RCTConvert BOOL:json]];
@@ -402,6 +410,21 @@ RCT_REMAP_METHOD(record,
             RCTLogError(@"Invalid view returned from registry, expecting RNCamera, got: %@", view);
         } else {
             [view record:options resolve:resolve reject:reject];
+        }
+    }];
+}
+
+RCT_EXPORT_METHOD(resumeFrameSaving:(nonnull NSNumber *)reactTag)
+{
+#if TARGET_IPHONE_SIMULATOR
+    return;
+#endif
+    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, RNCamera *> *viewRegistry) {
+        RNCamera *view = viewRegistry[reactTag];
+        if (![view isKindOfClass:[RNCamera class]]) {
+            RCTLogError(@"Invalid view returned from registry, expecting RNCamera, got: %@", view);
+        } else {
+            [view resumeFrameSaving];
         }
     }];
 }
