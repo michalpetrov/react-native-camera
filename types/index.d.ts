@@ -199,7 +199,7 @@ export interface RNCameraProps {
   }): void;
 
   // -- FRAME PROPS
-  onFrame?(event: { uri: string }): void;
+  onFrame?(event: { uri: string; width: number; height: number }): void;
 
   onGoogleVisionBarcodesDetected?(event: { barcodes: Barcode[] }): void;
 

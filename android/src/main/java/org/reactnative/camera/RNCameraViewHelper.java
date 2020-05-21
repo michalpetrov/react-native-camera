@@ -19,6 +19,7 @@ import com.google.android.cameraview.CameraView;
 import com.google.zxing.Result;
 import org.reactnative.camera.events.*;
 import org.reactnative.barcodedetector.RNBarcodeDetector;
+import org.reactnative.camera.tasks.FrameDescr;
 import org.reactnative.facedetector.RNFaceDetector;
 
 import java.text.SimpleDateFormat;
@@ -283,12 +284,12 @@ public class RNCameraViewHelper {
     });
   }
 
-  public static void emitFrameSavedEvent(final ViewGroup view, final String uri) {
+  public static void emitFrameSavedEvent(final ViewGroup view, final FrameDescr frameDescr) {
     final ReactContext reactContext = (ReactContext) view.getContext();
     reactContext.runOnNativeModulesQueueThread(new Runnable() {
       @Override
       public void run() {
-        FrameSavedEvent event = FrameSavedEvent.obtain(view.getId(), uri);
+        FrameSavedEvent event = FrameSavedEvent.obtain(view.getId(), frameDescr);
         reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher().dispatchEvent(event);
       }
     });

@@ -550,11 +550,11 @@ public class RNCameraView extends CameraView implements LifecycleEventListener, 
 
 
   @Override
-  public void onFrameSaved(String uri) {
+  public void onFrameSaved(FrameDescr frameDescr) {
     if (!mShouldSaveFrames) {
       return;
     }
-    RNCameraViewHelper.emitFrameSavedEvent(this, uri);
+    RNCameraViewHelper.emitFrameSavedEvent(this, frameDescr);
   }
 
   @Override

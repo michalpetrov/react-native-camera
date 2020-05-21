@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.UUID;
 
-public class FrameSaverAsyncTask extends android.os.AsyncTask<Void, Void, String> {
+public class FrameSaverAsyncTask extends android.os.AsyncTask<Void, Void, FrameDescr> {
     private byte[] mImageData;
     private int mWidth;
     private int mHeight;
@@ -28,7 +28,7 @@ public class FrameSaverAsyncTask extends android.os.AsyncTask<Void, Void, String
     }
 
     @Override
-    protected String doInBackground(Void... ignored) {
+    protected FrameDescr doInBackground(Void... ignored) {
         Log.i("RNC", "Saving frame");
         if (isCancelled() || mDelegate == null) {
             return null;
@@ -51,7 +51,7 @@ public class FrameSaverAsyncTask extends android.os.AsyncTask<Void, Void, String
             image.compressToJpeg(rectangle, 90, fOut);
             fOut.flush();
             fOut.close();
-            return Uri.fromFile(imageFile).toString();
+            return new FrameDescr(Uri.fromFile(imageFile).toString(), rotatedImageWidth, rotatedImageHeight);
         } catch (Exception e) {
             Log.e("RNC", "Failed to save", e);
             return null;
@@ -59,12 +59,12 @@ public class FrameSaverAsyncTask extends android.os.AsyncTask<Void, Void, String
     }
 
     @Override
-    protected void onPostExecute(String uri) {
-        super.onPostExecute(uri);
+    protected void onPostExecute(FrameDescr frameDescr) {
+        super.onPostExecute(frameDescr);
 
-        if (uri == null) {
+        if (frameDescr == null) {
         } else {
-            mDelegate.onFrameSaved(uri);
+            mDelegate.onFrameSaved(frameDescr);
             mDelegate.onFrameSavingTaskCompleted();
         }
     }

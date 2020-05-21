@@ -8,27 +8,34 @@ import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 
 import org.reactnative.camera.CameraViewManager;
+import org.reactnative.camera.tasks.FrameDescr;
 
 public class FrameSavedEvent extends Event<FrameSavedEvent> {
   private static final Pools.SynchronizedPool<FrameSavedEvent> EVENTS_POOL =
       new Pools.SynchronizedPool<>(3);
 
   private String mUri;
+  private int mWidth;
+  private int mHeight;
 
   private FrameSavedEvent() {}
 
-  public static FrameSavedEvent obtain(int viewTag, String uri) {
+  public static FrameSavedEvent obtain(int viewTag, FrameDescr frameDescr) {
     FrameSavedEvent event = EVENTS_POOL.acquire();
     if (event == null) {
       event = new FrameSavedEvent();
     }
-    event.init(viewTag, uri);
+    event.init(viewTag, frameDescr);
     return event;
   }
 
-  private void init(int viewTag, String uri) {
+  private void init(int viewTag, FrameDescr frameDescr) {
     super.init(viewTag);
-    mUri = uri;
+    if (frameDescr != null) {
+      mUri = frameDescr.getUri();
+      mWidth = frameDescr.getWidth();
+      mHeight = frameDescr.getHeight();
+    }
   }
 
   @Override
@@ -51,6 +58,8 @@ public class FrameSavedEvent extends Event<FrameSavedEvent> {
     WritableMap event = Arguments.createMap();
     event.putInt("target", getViewTag());
     event.putString("uri", mUri);
+    event.putInt("width", mWidth);
+    event.putInt("height", mHeight);
     return event;
   }
 }
