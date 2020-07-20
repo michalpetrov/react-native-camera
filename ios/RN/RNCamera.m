@@ -1382,7 +1382,7 @@ BOOL _sessionInterrupted = NO;
         // (see comment in -record), we go ahead and add the AVCaptureMovieFileOutput
         // to avoid an exposure rack on some devices that can cause the first few
         // frames of the recorded output to be underexposed.
-        if (![self.faceDetector isRealDetector] && ![self.textDetector isRealDetector] && ![self.barcodeDetector isRealDetector] && ![self.canSaveFrames]) {
+        if (![self.faceDetector isRealDetector] && ![self.textDetector isRealDetector] && ![self.barcodeDetector isRealDetector] && !self.canSaveFrames) {
             [self setupMovieFileCapture];
         }
         [self setupOrDisableBarcodeScanner];
@@ -2353,7 +2353,7 @@ BOOL _sessionInterrupted = NO;
             response[@"uri"] = [RNImageUtils writeImage:destData toPath:path];
             response[@"width"] = @(image.size.width);
             response[@"height"] = @(image.size.height);
-            [self onFrame:@{@"data": response, @"id":@"onFrame"}];
+            [self onFrame:response];
         }
     }
 }
