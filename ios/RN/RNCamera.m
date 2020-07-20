@@ -1330,7 +1330,7 @@ BOOL _sessionInterrupted = NO;
 
 - (void)resumeFrameSaving
 {
-    [self.finishedSavingFrame true];
+    self.finishedSavingFrame = true;
 }
 
 - (void)resumePreview
@@ -2351,8 +2351,8 @@ BOOL _sessionInterrupted = NO;
             NSMutableDictionary *response = [[NSMutableDictionary alloc] init];
             NSString *path = [RNFileSystem generatePathInDirectory:[[RNFileSystem cacheDirectoryPath] stringByAppendingPathComponent:@"Camera"] withExtension:@".jpg"];
             response[@"uri"] = [RNImageUtils writeImage:destData toPath:path];
-            response[@"width"] = @(takenImage.size.width);
-            response[@"height"] = @(takenImage.size.height);
+            response[@"width"] = @(image.size.width);
+            response[@"height"] = @(image.size.height);
             [self onFrame:@{@"data": response, @"id":@"onFrame"}];
         }
     }
