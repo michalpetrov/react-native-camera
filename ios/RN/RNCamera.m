@@ -1382,7 +1382,7 @@ BOOL _sessionInterrupted = NO;
         // (see comment in -record), we go ahead and add the AVCaptureMovieFileOutput
         // to avoid an exposure rack on some devices that can cause the first few
         // frames of the recorded output to be underexposed.
-        if (![self.faceDetector isRealDetector] && ![self.textDetector isRealDetector] && ![self.barcodeDetector isRealDetector]) {
+        if (![self.faceDetector isRealDetector] && ![self.textDetector isRealDetector] && ![self.barcodeDetector isRealDetector] && ![self.canSaveFrames]) {
             [self setupMovieFileCapture];
         }
         [self setupOrDisableBarcodeScanner];
