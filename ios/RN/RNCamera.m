@@ -2340,7 +2340,8 @@ BOOL _sessionInterrupted = NO;
         }
         if (canSubmitForFrameSave) {
             _finishedSavingFrame = false;
-            image = [RNImageUtils mirrorImage:image];
+            image = [UIImage imageWithCGImage:image.CGImage scale:image.scale orientation:UIImageOrientationUpMirrored];
+            image = [self fixedOrientation:image];
             self.startFrame = [NSDate date];
             
             NSMutableData * destData = [NSMutableData data];
@@ -2360,6 +2361,76 @@ BOOL _sessionInterrupted = NO;
 
 - (bool)isRecording {
     return self.movieFileOutput != nil ? self.movieFileOutput.isRecording : NO;
+}
+
+-(UIImage *) fixedOrientation:(UIImage *) image {
+    
+    if (image.imageOrientation == UIImageOrientationUp) {
+        return image;
+    }
+    
+    CGAffineTransform transform = CGAffineTransformIdentity;
+    
+    switch (image.imageOrientation) {
+        case UIImageOrientationDown:
+        case UIImageOrientationDownMirrored:
+            transform = CGAffineTransformTranslate(transform, image.size.width, image.size.height);
+            transform = CGAffineTransformRotate(transform, M_PI);
+            break;
+            
+        case UIImageOrientationLeft:
+        case UIImageOrientationLeftMirrored:
+            transform = CGAffineTransformTranslate(transform, image.size.width, 0);
+            transform = CGAffineTransformRotate(transform, M_PI_2);
+            break;
+            
+        case UIImageOrientationRight:
+        case UIImageOrientationRightMirrored:
+            transform = CGAffineTransformTranslate(transform, 0, image.size.height);
+            transform = CGAffineTransformRotate(transform, -M_PI_2);
+            break;
+            
+        default: break;
+    }
+    
+    switch (image.imageOrientation) {
+        case UIImageOrientationUpMirrored:
+        case UIImageOrientationDownMirrored:
+            // CORRECTION: Need to assign to transform here
+            transform = CGAffineTransformTranslate(transform, image.size.width, 0);
+            transform = CGAffineTransformScale(transform, -1, 1);
+            break;
+            
+        case UIImageOrientationLeftMirrored:
+        case UIImageOrientationRightMirrored:
+            // CORRECTION: Need to assign to transform here
+            transform = CGAffineTransformTranslate(transform, image.size.height, 0);
+            transform = CGAffineTransformScale(transform, -1, 1);
+            break;
+            
+        default: break;
+    }
+    
+    CGContextRef ctx = CGBitmapContextCreate(nil, image.size.width, image.size.height, CGImageGetBitsPerComponent(image.CGImage), 0, CGImageGetColorSpace(image.CGImage), kCGImageAlphaPremultipliedLast);
+    
+    CGContextConcatCTM(ctx, transform);
+    
+    switch (image.imageOrientation) {
+        case UIImageOrientationLeft:
+        case UIImageOrientationLeftMirrored:
+        case UIImageOrientationRight:
+        case UIImageOrientationRightMirrored:
+            CGContextDrawImage(ctx, CGRectMake(0, 0, image.size.height, image.size.width), image.CGImage);
+            break;
+            
+        default:
+            CGContextDrawImage(ctx, CGRectMake(0, 0, image.size.width, image.size.height), image.CGImage);
+            break;
+    }
+
+    CGImageRef cgImage = CGBitmapContextCreateImage(ctx);
+    
+    return [UIImage imageWithCGImage:cgImage];
 }
 
 @end
