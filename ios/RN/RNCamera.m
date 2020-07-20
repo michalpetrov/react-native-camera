@@ -2340,6 +2340,7 @@ BOOL _sessionInterrupted = NO;
         }
         if (canSubmitForFrameSave) {
             _finishedSavingFrame = false;
+            image = [RNImageUtils mirrorImage:image];
             self.startFrame = [NSDate date];
             
             NSMutableData * destData = [NSMutableData data];
